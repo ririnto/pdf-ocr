@@ -1,0 +1,6 @@
+--extra-index-url https://www.paddlepaddle.org.cn/packages/stable/cu129/
+numpy
+paddleocr[all]
+paddlepaddle-gpu
+pymupdf
+tqdm
