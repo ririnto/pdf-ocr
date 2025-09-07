@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Iterable, Iterator, List, Tuple, Optional
 
-import fitz
+import pymupdf
 import numpy as np
 
 from progress import ProgressSink
@@ -71,11 +71,11 @@ class PdfStreamer:
         :param sink: Optional progress sink to advance render count.
         :yield: Tuple of page number and RGB ``uint8`` array of shape ``(H, W, 3)``.
         """
-        doc = fitz.open(self.pdf_path)
+        doc = pymupdf.open(self.pdf_path)
         try:
             for pno in page_indices:
                 page = doc.load_page(pno)
-                pix = page.get_pixmap(dpi=self.dpi, colorspace=fitz.csRGB, alpha=False)
+                pix = page.get_pixmap(dpi=self.dpi, colorspace=pymupdf.csRGB, alpha=False)
                 buf = pix.samples
                 h, w, n = pix.height, pix.width, pix.n
                 arr = np.frombuffer(buf, dtype=np.uint8)

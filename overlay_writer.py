@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Dict, Any, Optional
 
-import fitz
+import pymupdf
 import unicodedata as _ud
 
 from progress import ProgressSink
@@ -38,13 +38,13 @@ class IncrementalOverlayWriter:
         self.output_pdf = output_pdf
         self.debug_visible = debug_visible
         shutil.copyfile(input_pdf, output_pdf)
-        self.doc = fitz.open(output_pdf)
+        self.doc = pymupdf.open(output_pdf)
         self.dbg_doc = None
         self.dbg_path = None
         if debug_visible:
             self.dbg_path = output_pdf.replace('.pdf', '_debug.pdf')
             shutil.copyfile(input_pdf, self.dbg_path)
-            self.dbg_doc = fitz.open(self.dbg_path)
+            self.dbg_doc = pymupdf.open(self.dbg_path)
 
     def _rect(self, poly) -> tuple[float, float, float, float]:
         """
@@ -57,7 +57,7 @@ class IncrementalOverlayWriter:
         ys = [float(p[1]) for p in poly]
         return min(xs), min(ys), max(xs), max(ys)
 
-    def _apply_one(self, doc: fitz.Document, page_no: int, items: List[Dict[str, Any]], visible: bool) -> None:
+    def _apply_one(self, doc: pymupdf.Document, page_no: int, items: List[Dict[str, Any]], visible: bool) -> None:
         """
         Apply overlay to a single page of the document.
 
@@ -81,10 +81,10 @@ class IncrementalOverlayWriter:
             x1_pt, y1_pt = x1 / self.scale, y1 / self.scale
             width_pt = max(0.1, x1_pt - x0_pt)
             if self.font_path:
-                font = fitz.Font(fontname="ocrfont", fontfile=self.font_path)
+                font = pymupdf.Font(fontname="ocrfont", fontfile=self.font_path)
                 font_name = "ocrfont"
             else:
-                font = fitz.Font("helv")
+                font = pymupdf.Font("helv")
                 font_name = "helv"
             w_at_1 = max(1e-6, font.text_length(text, fontsize=1))
             font_size = width_pt / w_at_1
@@ -93,7 +93,7 @@ class IncrementalOverlayWriter:
             asc = font.ascender
             if asc - desc != 0:
                 baseline_y += (desc / (asc - desc)) * font_size
-            insert_pt = fitz.Point(x0_pt, baseline_y)
+            insert_pt = pymupdf.Point(x0_pt, baseline_y)
             page.insert_text(
                 insert_pt, text,
                 fontname=font_name,

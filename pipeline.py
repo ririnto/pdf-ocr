@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-import fitz
+import pymupdf
 
 from ocr_engine import OcrEngine
 from overlay_writer import IncrementalOverlayWriter
@@ -63,7 +63,7 @@ class OCRPipeline:
         self.batch_size = max(1, batch_size)
         self.debug_visible = debug_visible
         self.sink = sink or TqdmProgressSink()
-        with fitz.open(input_pdf) as d:
+        with pymupdf.open(input_pdf) as d:
             total = d.page_count
         self.page_indices = PdfStreamer.select_pages(total, page_range=page_range, pages=pages, step=page_step)
         self.streamer = PdfStreamer(input_pdf, dpi=dpi)
